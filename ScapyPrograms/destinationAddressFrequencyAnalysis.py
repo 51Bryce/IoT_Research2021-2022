@@ -10,6 +10,6 @@ packets = rdpcap(r"C:\UWW\UndergraduateResearch\iotPrivacy\pcapFiles\Unfiltered\
 for packet in packets: #for each packet in pcap file
     if(packet.haslayer(IP)): #if the packet has an IP layer
         A.append(packet[IP].src) #add the IP source address to array
-    #get some further information???
+    #get some further information?
 #Array is completed
 print(Counter(A)) #count how many times every address occurs in array
