@@ -5,11 +5,11 @@
     # - Gives description of every unique destination address (know where your data is going)
 #Problems:
     # - Needs to precisely filter application data (there may be some external data from phone in pcap file)
+        # * Note: This problem is related to how we are capturing data, not the program itself
 
 from doctest import script_from_examples
 from scapy.all import * #import scapy module
-from scapy.layers.inet import IP
-from scapy.layers.inet import UDP
+from scapy.layers.inet import *
 from collections import Counter
 import ipinfo
 from ipinfo.handler_utils import cache_key
@@ -18,22 +18,25 @@ def analyze(filename):
     A = [] #IP destination addresses
     B = [] #UDP destination port information
     packets = rdpcap(filename)
-    #packets = rdpcap(fileName)
+    
+    #Everything in for loop counts IP address frequency and destination port frequency
     for packet in packets: #for each packet in pcap file
         if(packet.haslayer(IP) and packet.haslayer(UDP)): #if the packet has a UDP and IP layer
-            if(packet[IP].src == '192.168.2.159'): #filtering only packets that are coming FROM our router
+            if(packet[IP].src == '192.168.2.159'): #filtering only packets that are coming FROM our device
                 A.append(packet[IP].dst) #add the IP destination address to array
                 B.append(packet[IP].dst) #IP ADDRESSES IN THE C ARRAY ARE USING A DESTINATION PORT
                 B.append(packet[UDP].dport) #add the Destination port to array
 
         elif(packet.haslayer(IP)): #if the packet has an IP layer
-            if(packet[IP].src == '192.168.2.159'): #filtering only packets that are coming FROM our router
+            if(packet[IP].src == '192.168.2.159'): #filtering only packets that are coming FROM our device
                 A.append(packet[IP].dst) #add the IP destination address to array
 
     #Arrays are complete
     print("IPv4 Addresses:\n",Counter(A),"\n") #count how many times every destination address occurs in array
     print("UDP Destination Ports:\n",Counter(B),"\n") #count how many times every udp destination port occurs in array
-    print("IP Address Information:")
+
+    
+    print("IP Address Information:") #Everything below this line is how to the information on each IP address
 
     C = [] #Array of unique IP Addresses in pcap
     for i in A:
@@ -52,10 +55,8 @@ def analyze(filename):
     print('\n*********************************************************')
 
 def analyzeAll(): #put filepaths here for the pcap files you want to check
-    filenames = ['C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\KardiaInstallation.pcapng',
-    'C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\usingkardia.pcapng',
-    'C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\FitBitMeasure1.pcapng',
-    'C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\Qardio.pcapng']
+    filenames = ['C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\Qardio.pcapng',
+    'C:\\UWW\\UndergraduateResearch\\iotPrivacy\\pcapFiles\\Unfiltered\\QardioInstallation.pcapng']
     for filename in filenames:
         print('\n+++++++++++++++++++++++++ ',filename, '++++++++++++++++++++++++++++++++++++++++')
         analyze(filename)
